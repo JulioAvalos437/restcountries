@@ -10,6 +10,17 @@
 <body>
     <div class="container">
         <h1 class="mt-4">Buscador de Países</h1>
+        <a href="/restcountries/map.html">Utilizar el mapa interactivo</a>
+        <!-- Agregar filtro con botones de radio para continentes -->
+        <div class="mt-3">
+            <label><input type="radio" name="continent" value="" checked> Todos los Continentes</label>
+            <label><input type="radio" name="continent" value="Africa"> África</label>
+            <label><input type="radio" name="continent" value="Americas"> América</label>
+            <label><input type="radio" name="continent" value="Asia"> Asia</label>
+            <label><input type="radio" name="continent" value="Europe"> Europa</label>
+            <label><input type="radio" name="continent" value="Oceania"> Oceanía</label>
+        </div>
+
         <input type="text" id="search" class="form-control mt-3" placeholder="Buscar país..." />
         <ul id="results" class="list-group mt-3"></ul>
     </div>

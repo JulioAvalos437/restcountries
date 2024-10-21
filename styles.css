@@ -11,3 +11,8 @@ ul {
 .list-group-item {
     cursor: pointer;
 }
+
+#map {
+    height: 400px;
+    width: 100%;
+}

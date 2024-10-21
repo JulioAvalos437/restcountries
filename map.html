@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Mundial con Países Seleccionables</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<br>
+<h1>Selecciona un País</h1>
+
+<div id="map" style="height: 600px;"></div>
+
+<!-- Modal -->
+<div class="modal fade" id="countryModal" tabindex="-1" role="dialog" aria-labelledby="countryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="countryModalLabel">Información del País</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="countryInfo">
+                <!-- Información del país se insertará aquí -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    const map = L.map('map', {
+        center: [20, 0],
+        zoom: 3,
+        minZoom: 2,
+        maxZoom: 10,
+        maxBounds: [[-90, -180], [90, 180]],
+        maxBoundsViscosity: 1.5
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+        .then(response => response.json())
+        .then(data => {
+            L.geoJSON(data, {
+                onEachFeature: function (feature, layer) {
+                    layer.on('click', function () {
+                        const countryName = feature.properties.ADMIN;
+                        fetch(`https://restcountries.com/v3.1/name/${countryName}`)
+                            .then(response => response.json())
+                            .then(countryData => {
+                                const country = countryData[0];
+                                const info = `
+                                    <strong>Nombre:</strong> ${country.name.common}<br>
+                                    <strong>Capital:</strong> ${country.capital ? country.capital[0] : 'N/A'}<br>
+                                    <strong>Población:</strong> ${country.population.toLocaleString()}<br>
+                                    <strong>Área:</strong> ${country.area.toLocaleString()} km²<br>
+                                    <strong>Región:</strong> ${country.region}<br>
+                                    <strong>Subregión:</strong> ${country.subregion}<br>
+                                    <strong>Idiomas:</strong> ${Object.values(country.languages).join(', ')}<br>
+                                    <strong>Moneda:</strong> ${Object.values(country.currencies).map(c => c.name).join(', ')}
+                                `;
+                                document.getElementById('countryInfo').innerHTML = info;
+                                $('#countryModal').modal('show');
+                            });
+                    });
+                }
+            }).addTo(map);
+        });
+</script>
+</body>
+</html>
